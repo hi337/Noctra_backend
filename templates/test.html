@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload Video - Noctra</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        color: #333;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+        background-color: #ffffff;
+        border-bottom: 1px solid #ddd;
+      }
+      .menu-icon,
+      .user-icon {
+        font-size: 1.5rem;
+        cursor: pointer;
+      }
+      .logo {
+        font-weight: bold;
+        font-size: 1.2rem;
+        margin-top: 2px;
+      }
+      .profile-pic {
+        height: 32px;
+        width: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+      .nav-drawer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 150px;
+        background-color: #fff;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 1000;
+      }
+      .nav-drawer.open {
+        transform: translateX(0);
+      }
+      .nav-drawer a {
+        display: block;
+        padding: 10px 0;
+        color: #333;
+        text-decoration: none;
+      }
+      .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.3);
+        z-index: 999;
+        display: none;
+      }
+      .overlay.show {
+        display: block;
+      }
+      .upload-section {
+        padding: 20px;
+      }
+      .upload-box {
+        background-color: #fff;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+      input[type="file"] {
+        margin-top: 10px;
+        margin-bottom: 15px;
+      }
+      .submit-button {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      video {
+        width: 100%;
+        border-radius: 10px;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="menu-icon" onclick="toggleDrawer()">☰</div>
+      <a href="index.html">
+        <div class="logo">
+          <img
+            src="../static/img/image.png"
+            alt="Noctra Logo"
+            style="height: 30px"
+          />
+        </div>
+      </a>
+      <a href="profile.html">
+        <div class="user-icon">
+          <img
+            src="../static/img/Jessica_Alba.jpg"
+            alt="Jessica"
+            class="profile-pic"
+          />
+        </div>
+      </a>
+    </header>
+
+    <!-- Navigation Drawer -->
+    <div id="navDrawer" class="nav-drawer">
+      <a href="index.html">Overview</a>
+      <a href="activity.html">Activity</a>
+      <a href="profile.html">Profile</a>
+      <a href="upload.html">Upload</a>
+    </div>
+    <div id="overlay" class="overlay" onclick="toggleDrawer()"></div>
+
+    <div class="upload-section">
+      <h1>Upload Infant Monitor Footage</h1>
+      <div class="upload-box">
+        <form
+          id="uploadForm"
+          action="/upload_video"
+          method="post"
+          enctype="multipart/form-data"
+        >
+          <label for="video">Select a video file:</label><br />
+          <input
+            type="file"
+            id="video"
+            name="video"
+            accept="video/*"
+            required
+          /><br />
+          <button type="submit" class="submit-button">Upload & Annotate</button>
+        </form>
+      </div>
+      <div id="result">
+        <!-- Annotated video will be embedded here if available -->
+      </div>
+    </div>
+
+    <script>
+      function toggleDrawer() {
+        const drawer = document.getElementById("navDrawer");
+        const overlay = document.getElementById("overlay");
+        const isOpen = drawer.classList.contains("open");
+
+        if (isOpen) {
+          drawer.classList.remove("open");
+          overlay.classList.remove("show");
+        } else {
+          drawer.classList.add("open");
+          overlay.classList.add("show");
+        }
+      }
+      // Handle form submission via JavaScript
+      document
+        .getElementById("uploadForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const formData = new FormData(this);
+          const response = await fetch("/upload_video", {
+            method: "POST",
+            body: formData,
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            alert("Upload failed: " + errorText);
+            return;
+          }
+
+          const data = await response.json();
+          const videoUrl = data.annotated_url;
+          alert(videoUrl);
+
+          document.getElementById("result").innerHTML = `
+    <h2>Annotated Video:</h2>
+    <video controls style="width:100%; border-radius:10px">
+      <source src="${videoUrl}" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+  `;
+        });
+    </script>
+  </body>
+</html>
