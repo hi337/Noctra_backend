@@ -134,6 +134,13 @@ if __name__ == "__main__":
             alpha_metric = smooth_band_powers[Band.Alpha] / \
                 smooth_band_powers[Band.Delta]
             print('Alpha Relaxation: ', alpha_metric)
+
+            if alpha_metric < 0.8:
+                print("possible abnormal suppression or deep unconscious state")
+            elif alpha_metric < 1.5:
+                print("possibly deep sleep or relaxed state")
+            else:
+                print("relaxed wakefulness or healthy sleep cycle")
             
 
             # Beta Protocol:
@@ -143,12 +150,28 @@ if __name__ == "__main__":
                 smooth_band_powers[Band.Theta]
             print('Beta Concentration: ', beta_metric)
 
+            if beta_metric < 0.6:
+                print("possible cortical underactivity")
+            elif beta_metric < 1.0:
+                print("may be asleep or drowsy")
+            else:
+                print("cognitively alert (unusual at night unless waking)")
+
+
+
             # Alpha/Theta Protocol:
             # This is another popular neurofeedback metric for stress reduction
             # Higher theta over alpha is supposedly associated with reduced anxiety
             theta_metric = smooth_band_powers[Band.Theta] / \
                 smooth_band_powers[Band.Alpha]
             print('Theta Relaxation: ', theta_metric)
+
+            if theta_metric > 2.5:
+                print("potential abnormal drowsiness or suppression")
+            elif theta_metric > 1.5:
+                print("deep sleep or transitional state")
+            else:
+                print("calm wakefulness or light sleep")
 
     except KeyboardInterrupt:
         print('Closing!')
